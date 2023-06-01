@@ -2,60 +2,68 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.SocialPlatforms.Impl;
 
 namespace Assets.player
 {
-    internal class PlayerController : MonoBehaviour
+    public class PlayerController : MonoBehaviour
     {
-        public bool isCollidingWithEnemy;
-        public bool isOnGround = true;
-        public GameObject arrowPrefab;
+        public const string k_ArrowSpawnPoint = "ArrowSpawnPoint";
+        public static PlayerController Instance { get; private set; }
+        public bool m_IsCollidingWithEnemy;
+        public bool m_IsOnGround = true;
+        public GameObject m_ArrowPrefab;
 
-        private int score;
-        private float lastShootTime;
-        private Rigidbody2D rigidbodyPlayer;
-        private Transform arrowSpawnPoint;
-        private SpriteRenderer flipPlayer;
-        private Animator anim;
+        private int m_Score;
+        private float m_LastShootTime;
+        private Rigidbody2D m_RigidbodyPlayer;
+        private Transform m_ArrowSpawnPoint;
+        private SpriteRenderer m_FlipPlayer;
+        private Animator m_Anim;
 
-        public UnityEvent onPlayerDying = new UnityEvent();
+        public UnityEvent OnPlayerDying = new UnityEvent();
 
         [SerializeField]
         [Range(5f, 100f)]
-        private float jump;
+        private float m_Jump;
         [SerializeField]
-        private float speed = 35f;
-        [SerializeField] 
-        private float shootCooldown = 0.45f;
+        private float m_Speed = 35f;
         [SerializeField]
-        private UI playerUi;
-        private bool isFirstShot;
+        private float m_ShootCooldown = 0.45f;
+        [SerializeField]
+        private UI m_PlayerUi;
+        private bool m_IsFirstShot;
 
-        public bool IsJump => Input.GetKey(KeyCode.Space) && isOnGround;
+        public bool IsJump => Input.GetKey(KeyCode.Space) && m_IsOnGround;
         public bool IsShoot => Input.GetKeyDown(KeyCode.E);
-        
+
         private void Awake()
         {
-            score = 0;
-            rigidbodyPlayer = GetComponent<Rigidbody2D>();
-            isFirstShot = true;
+            if (Instance != null)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
+            m_Score = 0;
+            m_RigidbodyPlayer = GetComponent<Rigidbody2D>();
+            m_IsFirstShot = true;
         }
 
         private void Start()
         {
-            lastShootTime = Time.time;
-            arrowSpawnPoint = transform.Find("ArrowSpawnPoint");
-            anim = GetComponentInChildren<Animator>();
-            flipPlayer = GetComponentInChildren<SpriteRenderer>();
+            m_ArrowSpawnPoint = transform.Find(k_ArrowSpawnPoint);
+            Debug.Assert(m_ArrowSpawnPoint is not null, "m_ArrowSpawnPoint is null");
+            m_Anim = GetComponentInChildren<Animator>();
+            m_LastShootTime = Time.time;
+            m_FlipPlayer = GetComponentInChildren<SpriteRenderer>();
 
-            if (playerUi == null)
+            if (m_PlayerUi is null)
             {
-                Debug.Log("playerUi is null");
+                Debug.LogError("playerUi is null");
             }
             else
             {
-                onPlayerDying.AddListener(playerUi.Playerkilled);
+                OnPlayerDying.AddListener(m_PlayerUi.Playerkilled);
             }
         }
 
@@ -63,9 +71,7 @@ namespace Assets.player
         private void Update()
         {
             Walk();
-
             UpdateJump();
-
             UpdateShooting();
         }
 
@@ -79,16 +85,16 @@ namespace Assets.player
                 {
                     StartCoroutine(ArrowGenerator());
 
-                    if (isFirstShot)
+                    if (m_IsFirstShot)
                     {
-                        playerUi.PlayersFirstShotWasFired();
-                        isFirstShot = false;
+                        m_PlayerUi.PlayersFirstShotWasFired();
+                        m_IsFirstShot = false;
                     }
                     runShootingAnimation = true;
                 }
             }
 
-            anim.SetBool("isShooting", runShootingAnimation);
+            m_Anim.SetBool("isShooting", runShootingAnimation);
         }
 
         private void UpdateJump()
@@ -98,47 +104,51 @@ namespace Assets.player
             if (IsJump)
             {
                 runJumpingAnimation = true;
-                rigidbodyPlayer.velocity = new Vector2(0, jump);
-                isOnGround = false;
+                m_RigidbodyPlayer.velocity = new Vector2(0, m_Jump);
+                m_IsOnGround = false;
             }
 
-            anim.SetBool("isJumping", runJumpingAnimation);
+            m_Anim.SetBool("isJumping", runJumpingAnimation);
         }
 
         IEnumerator ArrowGenerator()
         {
             yield return new WaitForSeconds(0.3f);
-            GameObject arrow = Instantiate(arrowPrefab, arrowSpawnPoint.position, Quaternion.Euler(0, 0, -90));
+            if (m_ArrowPrefab is null)
+            {
+                Debug.Log("m_ArrowPrefab is null");
+            }
+            GameObject arrow = Instantiate(m_ArrowPrefab, m_ArrowSpawnPoint.position, Quaternion.Euler(0, 0, -90));
             arrow.GetComponent<ArrowShooting>().onKillingEnemy.AddListener(KillEnemy);
             arrow.GetComponent<Rigidbody2D>().velocity = new Vector2(70f, 3f);
         }
 
         private void KillEnemy()
         {
-            score++;
-            playerUi.Score = score;
+            m_Score++;
+            m_PlayerUi.Score = m_Score;
         }
 
         private void Walk()
         {
             float moveHorizontal = Input.GetAxis("Horizontal");
-            rigidbodyPlayer.velocity = new Vector2(moveHorizontal * speed, rigidbodyPlayer.velocity.y);
+            m_RigidbodyPlayer.velocity = new Vector2(moveHorizontal * m_Speed, m_RigidbodyPlayer.velocity.y);
             bool runWalkingAnimation = false;
 
             if (moveHorizontal > 0.01f)
             {
-                flipPlayer.flipX = false;
+                m_FlipPlayer.flipX = false;
                 runWalkingAnimation = true;
             }
             else if (moveHorizontal < -0.01f)
             {
-                flipPlayer.flipX = true;
+                m_FlipPlayer.flipX = true;
                 runWalkingAnimation = true;
             }
 
-            anim.SetBool("isWalking", runWalkingAnimation);
+            m_Anim.SetBool("isWalking", runWalkingAnimation);
         }
-        
+
         private void OnCollisionEnter2D(Collision2D collision)
         {
             if (collision.gameObject.CompareTag("Enemy"))
@@ -147,14 +157,14 @@ namespace Assets.player
             }
             else if (collision.gameObject.CompareTag("Ground"))
             {
-                isOnGround = true;
+                m_IsOnGround = true;
             }
         }
 
         private void PlayerDie()
         {
-            anim.SetBool("isDie", true);
-            isCollidingWithEnemy = true;
+            m_Anim.SetBool("isDie", true);
+            m_IsCollidingWithEnemy = true;
             Destroy(gameObject, 0.3f);
         }
 
@@ -162,18 +172,18 @@ namespace Assets.player
         {
             if (collision.gameObject.CompareTag("Enemy"))
             {
-                isCollidingWithEnemy = false;
+                m_IsCollidingWithEnemy = false;
             }
         }
 
         private bool HasPlayerCooldownExpired()
         {
-            float timeSinceLastAction = Time.time - lastShootTime;
-            bool canPlayrShootArrow = timeSinceLastAction >= shootCooldown && !flipPlayer.flipX;
+            float timeSinceLastAction = Time.time - m_LastShootTime;
+            bool canPlayrShootArrow = timeSinceLastAction >= m_ShootCooldown && !m_FlipPlayer.flipX;
 
             if (canPlayrShootArrow)
             {
-                lastShootTime = Time.time; 
+                m_LastShootTime = Time.time;
             }
 
             return canPlayrShootArrow;
@@ -181,7 +191,7 @@ namespace Assets.player
 
         private void OnDestroy()
         {
-            onPlayerDying?.Invoke();
+            OnPlayerDying?.Invoke();
         }
     }
 }

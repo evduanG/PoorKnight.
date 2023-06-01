@@ -1,34 +1,32 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
+[RequireComponent(typeof(Rigidbody))]
 public class Enemy : MonoBehaviour
 {
-    public UnityEvent onObjectDestroyed = new UnityEvent();
-    private byte LifePoints = 3;
-    private Rigidbody2D rigidbody;
-    private float speed;
-    private bool isToRight = true;
-    public float Speed { get => speed * Direction;  set => speed = value;  }
+    public UnityEvent OnObjectDestroyed = new UnityEvent();
+    private byte m_LifePoints = 3;
+    private Rigidbody2D m_Rigidbody;
+    private float m_Speed;
+    private bool m_IsToRight = true;
+    public float Speed 
+    { 
+        get => m_Speed * Direction; 
+        set => m_Speed = value; 
+    }
     public float Direction
     {
-        get => isToRight ? -1 : 1;
+        get => m_IsToRight ? -1 : 1;
     }
-    private void Start()
+    private void Awake()
     {
-        rigidbody = GetComponent<Rigidbody2D>();
-
-        if (rigidbody == null)
-        {
-            Debug.LogError("Enemy rigidbody is null ");
-        }
+        m_Rigidbody = GetComponent<Rigidbody2D>();
+        Debug.Assert(m_Rigidbody != null, "Enemy rigidbody is null ");
     }
 
     void OnDestroy()
     {
-        onObjectDestroyed.Invoke();
+        OnObjectDestroyed.Invoke();
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -41,7 +39,7 @@ public class Enemy : MonoBehaviour
             }
             else
             {
-                LifePoints--;
+                m_LifePoints--;
             }
         }
         else if (collision.gameObject.CompareTag("wall"))
@@ -52,12 +50,12 @@ public class Enemy : MonoBehaviour
 
     private void Update()
     {
-        this.rigidbody.velocity = new Vector2(Speed , this.rigidbody.velocity.y);
+        this.m_Rigidbody.velocity = new Vector2(Speed, this.m_Rigidbody.velocity.y);
     }
 
     internal bool Waskilled()
     {
-        return LifePoints -1 <= 0;
+        return m_LifePoints - 1 <= 0;
     }
 
     internal void PlayerKilled()

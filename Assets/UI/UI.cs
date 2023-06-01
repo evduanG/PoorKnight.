@@ -4,14 +4,14 @@ using UnityEngine.UI;
 
 public class UI : MonoBehaviour
 {
+    public const string k_FormtToShow = @"Score: {0}";
     private int m_Score;
-    private const string k_FormtToShow = @"Score: {0}";
     [SerializeField]
-    private Text scoreText;
+    private Text m_ScoreText;
     [SerializeField]
-    private Text gameOverText;
+    private Text m_GameOverText;
     [SerializeField]
-    private Text orderText;
+    private Text m_OrderText;
 
     public int Score
     {
@@ -25,37 +25,38 @@ public class UI : MonoBehaviour
 
     private void Start()
     {
-        if (scoreText == null)
+        if (m_ScoreText is null)
         {
             Debug.LogError("cont find the scoreText Text element");
         }
         else
         {
-            Score = 0; 
+            Score = 0;
         }
-        if (gameOverText == null)
+
+        if (m_GameOverText is null)
         {
             Debug.LogError("cont find the gameOverText Text element");
         }
         else
         {
-            gameOverText.enabled = false;
+            m_GameOverText.enabled = false;
         }
     }
 
     private void updatingText()
     {
-        scoreText.text = string.Format(k_FormtToShow, m_Score);
+        m_ScoreText.text = string.Format(k_FormtToShow, m_Score);
     }
 
     public void Playerkilled()
     {
-        PlayersFirstShotWasFired(); 
-        gameOverText.enabled = true;
+        PlayersFirstShotWasFired();
+        m_GameOverText.enabled = true;
     }
 
     public void PlayersFirstShotWasFired()
     {
-        orderText.enabled = false;
+        m_OrderText.enabled = false;
     }
 }

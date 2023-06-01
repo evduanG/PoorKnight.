@@ -239,9 +239,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 206feb142ac95044487cc4b3ea426a80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreText: {fileID: 498249248}
-  gameOverText: {fileID: 554890289}
-  orderText: {fileID: 751237940}
+  m_ScoreText: {fileID: 498249248}
+  m_GameOverText: {fileID: 554890289}
+  m_OrderText: {fileID: 751237940}
 --- !u!1 &217498716
 GameObject:
   m_ObjectHideFlags: 0
@@ -4199,7 +4199,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45693d03cb6994147976e1b2299dbf08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Player: {fileID: 0}
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0
@@ -4602,16 +4601,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42e1335c5248d1542abc6c0fda4b2d4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isCollidingWithEnemy: 0
-  isOnGround: 1
-  arrowPrefab: {fileID: 2464878700093745102, guid: a83ede47946da954aa6bf7f6924a4036, type: 3}
-  onPlayerDying:
+  m_IsCollidingWithEnemy: 0
+  m_IsOnGround: 1
+  m_ArrowPrefab: {fileID: 2464878700093745102, guid: a83ede47946da954aa6bf7f6924a4036, type: 3}
+  OnPlayerDying:
     m_PersistentCalls:
       m_Calls: []
-  jump: 22
-  speed: 15
-  shootCooldown: 0.45
-  playerUi: {fileID: 17308779}
+  m_Jump: 12.4
+  m_Speed: 35
+  m_ShootCooldown: 0.45
+  m_PlayerUi: {fileID: 17308779}
 --- !u!1 &1193244085
 GameObject:
   m_ObjectHideFlags: 0
@@ -4663,7 +4662,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1193244085}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -47.9, y: 0, z: 0}
+  m_LocalPosition: {x: -48.8, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 10, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4729,10 +4728,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4378590eac6691e4a9cd71d69257db41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemySpawnTime: 1
-  enemyPrefab: {fileID: 2117197918022817524, guid: 6318ad3243ac77d42bb2be4de35518ce, type: 3}
-  maxNumOfEnemy: 6
-  minSpeedForEnemy: 9.4
+  m_EnemyPrefab: {fileID: 2117197918022817524, guid: 6318ad3243ac77d42bb2be4de35518ce, type: 3}
+  m_MaxNumOfEnemy: 16
+  m_MinSpeedForEnemy: 9.4
 --- !u!1 &1207887220
 GameObject:
   m_ObjectHideFlags: 0
